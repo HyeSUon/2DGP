@@ -1,6 +1,7 @@
 import random
 import json
 import os
+
 from pico2d import *
 import game_framework
 import game_world
@@ -19,11 +20,12 @@ def enter():
     global boy, grass
     boy = Boy()
     grass = Grass()
-    game_world.add_object(grass, 0)
-    game_world.add_object(boy, 1)
+
 
 def exit():
-    game_world.clear()
+    global boy, grass
+    del boy
+    del grass
 
 def pause():
     pass
@@ -45,14 +47,13 @@ def handle_events():
 
 
 def update():
-    for game_object in game_world.all_objects():
-        game_object.update()
+    boy.update()
 
 
 def draw():
     clear_canvas()
-    for game_object in game_world.all_objects():
-        game_object.draw()
+    grass.draw()
+    boy.draw()
     update_canvas()
 
 
