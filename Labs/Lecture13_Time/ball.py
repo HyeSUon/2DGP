@@ -1,10 +1,10 @@
 from pico2d import *
 import game_world
-
-class Ball:
+import random
+class Bird:
     image = None
 
-    def __init__(self, x = 400, y = 300, velocity = 1):
+    def __init__(self, x = random.randint(100,1500-1), y = random.randint(100,700), velocity = 1):
         if Ball.image == None:
             Ball.image = load_image('ball21x21.png')
         self.x, self.y, self.velocity = x, y, velocity
