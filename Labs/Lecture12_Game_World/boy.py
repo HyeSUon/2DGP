@@ -1,14 +1,15 @@
 from pico2d import *
 from ball import Ball
-
+import game_world
 # Boy Event
-RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SLEEP_TIMER = range(5)
+RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SLEEP_TIMER, SPACE = range(6)
 
 key_event_table = {
     (SDL_KEYDOWN, SDLK_RIGHT): RIGHT_DOWN,
     (SDL_KEYDOWN, SDLK_LEFT): LEFT_DOWN,
     (SDL_KEYUP, SDLK_RIGHT): RIGHT_UP,
-    (SDL_KEYUP, SDLK_LEFT): LEFT_UP
+    (SDL_KEYUP, SDLK_LEFT): LEFT_UP,
+    (SDL_KEYDOWN, SDLK_SPACE): SPACE,
 }
 
 
@@ -28,7 +29,8 @@ class IdleState:
         boy.timer = 1000
 
     def exit(boy, event):
-        pass
+        if event == SPACE:
+            boy.fire_ball()
 
     def do(boy):
         boy.frame = (boy.frame + 1) % 8
@@ -57,7 +59,8 @@ class RunState:
         boy.dir = boy.velocity
 
     def exit(boy, event):
-        pass
+        if event == SPACE:
+            boy.fire_ball()
 
     def do(boy):
         boy.frame = (boy.frame + 1) % 8
@@ -91,11 +94,13 @@ class SleepState:
 
 
 next_state_table = {
-    IdleState: {RIGHT_UP: RunState, LEFT_UP: RunState, RIGHT_DOWN: RunState, LEFT_DOWN: RunState, SLEEP_TIMER: SleepState},
-    RunState: {RIGHT_UP: IdleState, LEFT_UP: IdleState, LEFT_DOWN: IdleState, RIGHT_DOWN: IdleState},
-    SleepState: {LEFT_DOWN: RunState, RIGHT_DOWN: RunState, LEFT_UP: RunState, RIGHT_UP: RunState}
+    IdleState: {RIGHT_UP: RunState, LEFT_UP: RunState, RIGHT_DOWN: RunState, LEFT_DOWN: RunState, SLEEP_TIMER: SleepState,
+                SPACE: IdleState},
+    RunState: {RIGHT_UP: IdleState, LEFT_UP: IdleState, LEFT_DOWN: IdleState, RIGHT_DOWN: IdleState,
+               SPACE: RunState},
+    SleepState: {LEFT_DOWN: RunState, RIGHT_DOWN: RunState, LEFT_UP: RunState, RIGHT_UP: RunState,
+                 SPACE: IdleState}
 }
-
 
 class Boy:
 
@@ -128,4 +133,7 @@ class Boy:
         if (event.type, event.key) in key_event_table:
             key_event = key_event_table[(event.type, event.key)]
             self.add_event(key_event)
+    def fire_ball(self):
+        ball = Ball(self.x, self.y, self.dir*3)
+        game_world.add_object(ball, 1)
 
